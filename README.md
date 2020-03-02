@@ -3,6 +3,7 @@ Test setup with live TCP server and client. The test was designed for use in a W
 
 # Requirements
 C Compiler (GNU C Compiler, MinGW, etc.)
+Terminal (Command Line Interface, Powershell, etc.)
 
 # Usage
 This is a simple test consisting of a TCP server and client designed to interact with each other. The socket address has been configured to the localhost IP and is running on port 9002.
