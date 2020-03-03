@@ -2,6 +2,43 @@
 #include <string.h>
 #include <ws2tcpip.h>
 
+void sendWebData(char webRequest[], int destination_socket)
+{
+    if (memcmp(webRequest, "GET", 3) == 0)
+    {
+        char data_string[600] = {0};
+        char http_header[2048] = "HTTP/1.1 200 OK\r\n";
+        if (strstr(webRequest, "text/css") != NULL)
+        {
+            printf("Requesting .css file!\n");
+            FILE *css_style = fopen("./assets/style.css", "r");
+            strcat(http_header, "Content-Type: text/css;\r\n\r\n");
+            fgets(data_string, sizeof(data_string), css_style);
+
+            strcat(http_header, data_string);
+        }
+        else if (strstr(webRequest, "text/html") != NULL)
+        {
+            printf("Requesting .html file!\n");
+            // Read and put the html page, index.html, into memory
+            FILE *html_page = fopen("./index.html", "r");
+            strcat(http_header, "Content-Type: text/html; charset: UTF-8\r\n\r\n");
+            fgets(data_string, sizeof(data_string), html_page);
+
+            // Response header tells the client that the request was received successfully
+            // We make the header large so that we can hold the html_string too
+            strcat(http_header, data_string);
+        }
+        else
+        {
+            printf("No compatible file requested...");
+        }
+        // Send the server_message string to the client at client_socket
+        send(destination_socket, http_header, strlen(http_header), 0);
+        printf("Data sent to client\n");
+    }
+}
+
 int main()
 {
     if (SYSTEM == "Windows")
@@ -49,39 +86,7 @@ int main()
         char buffer[2000] = {0};
         valread = recv(client_socket, buffer, 2000, 0);
 
-        if (memcmp(buffer, "GET", 3) == 0)
-        {
-            char data_string[600] = {0};
-            char http_header[2048] = "HTTP/1.1 200 OK\r\n";
-            if (strstr(buffer, "text/css") != NULL)
-            {
-                printf("Requesting .css file!\n");
-                FILE *css_style = fopen("./assets/style.css", "r");
-                strcat(http_header, "Content-Type: text/css;\r\n\r\n");
-                fgets(data_string, sizeof(data_string), css_style);
-
-                strcat(http_header, data_string);
-            }
-            else if (strstr(buffer, "text/html") != NULL)
-            {
-                printf("Requesting .html file!\n");
-                // Read and put the html page, index.html, into memory
-                FILE *html_page = fopen("./index.html", "r");
-                strcat(http_header, "Content-Type: text/html; charset: UTF-8\r\n\r\n");
-                fgets(data_string, sizeof(data_string), html_page);
-
-                // Response header tells the client that the request was received successfully
-                // We make the header large so that we can hold the html_string too
-                strcat(http_header, data_string);
-            }
-            else
-            {
-                printf("No compatible file requested...");
-            }
-            // Send the server_message string to the client at client_socket
-            send(client_socket, http_header, strlen(http_header), 0);
-            printf("Data sent to client\n");
-        }
+        sendWebData(buffer, client_socket);
 
         shutdown(client_socket, SD_SEND);
     }
