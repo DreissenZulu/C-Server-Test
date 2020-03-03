@@ -1,7 +1,7 @@
 # C Server Test
 The purpose of this repository is to experiment with using C for backend web development. This repo currently has two separate tests.
 1. Setup with live TCP server and client. The test was designed for use in a Windows environment, but (hopefully :pray:) should work on Linux and Mac environments too.
-2. Setup with basic HTML webpage and local server. The local server is designed to serve a web page to the client in a browser when requested, and to stop the client from requesting any more data when finished.
+2. Setup with basic HTML webpage and live local server. The local server is designed to serve a web page to the client in a browser when requested, and to stop the client from requesting any more data when finished.
 
 # Requirements
 * C Compiler (GNU C Compiler, MinGW, etc.)
