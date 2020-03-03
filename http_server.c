@@ -4,9 +4,10 @@
 
 void sendWebData(char webRequest[], int destination_socket)
 {
+    // Execute if client sends a GET request
     if (memcmp(webRequest, "GET", 3) == 0)
     {
-        char data_string[600] = {0};
+        char data_string[750] = {0};
         char http_header[2048] = "HTTP/1.1 200 OK\r\n";
         if (strstr(webRequest, "text/css") != NULL)
         {
@@ -14,7 +15,7 @@ void sendWebData(char webRequest[], int destination_socket)
             FILE *css_style = fopen("./assets/style.css", "r");
             strcat(http_header, "Content-Type: text/css;\r\n\r\n");
             fgets(data_string, sizeof(data_string), css_style);
-
+            fclose(css_style);
             strcat(http_header, data_string);
         }
         else if (strstr(webRequest, "text/html") != NULL)
@@ -24,18 +25,44 @@ void sendWebData(char webRequest[], int destination_socket)
             FILE *html_page = fopen("./index.html", "r");
             strcat(http_header, "Content-Type: text/html; charset: UTF-8\r\n\r\n");
             fgets(data_string, sizeof(data_string), html_page);
-
+            fclose(html_page);
             // Response header tells the client that the request was received successfully
             // We make the header large so that we can hold the html_string too
             strcat(http_header, data_string);
         }
+        else if (strstr(webRequest, "image/webp") != NULL)
+        {
+            // We want to isolate the requested file path to accurately return the correct image
+            // Assuming this path is between "GET " and " HTTP"
+            const char *STARTPATTERN = "GET ";
+            const char *ENDPATTERN = " HTTP/";
+            char *start, *end;
+            char *imgPath = NULL;
+            if (start = strstr(webRequest, STARTPATTERN))
+            {
+                // Start start at the image path
+                start += strlen(STARTPATTERN);
+                if (end = strstr(start, ENDPATTERN))
+                {
+                    // Allocate memory to image path
+                    imgPath = (char *)malloc(end - start + 1);
+                    memcpy(imgPath, start, end - start);
+                    imgPath[end - start] = '\0';
+                }
+            }
+            // FILE *img_bin = fopen(imgPath, "rb");
+            strcat(http_header, "Content-Type: image/webp;\r\n\r\n");
+            // fread(data_string, sizeof(data_string), 1, img_bin);
+            // fclose(img_bin);
+            // strcat(http_header, data_string);
+            // printf("%s", http_header);
+        }
         else
         {
-            printf("No compatible file requested...");
+            printf("No compatible file requested. Browser is requesting the following:\n%s", webRequest);
         }
         // Send the server_message string to the client at client_socket
         send(destination_socket, http_header, strlen(http_header), 0);
-        printf("Data sent to client\n");
     }
 }
 
