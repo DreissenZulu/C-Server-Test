@@ -25,6 +25,7 @@ int main()
     struct sockaddr_in server_address;
     int addr_len = sizeof(server_address);
     int client_socket;
+    long valread;
 
     if ((server_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
     {
@@ -54,6 +55,10 @@ int main()
         }
 
         printf("Connection established at %d\n", ntohs(server_address.sin_port));
+        char buffer[2000] = {0};
+        valread = recv(client_socket, buffer, 2000, 0);
+        printf("%s\n", buffer);
+
         // Send the server_message string to the client at client_socket
         send(client_socket, http_header, strlen(http_header), 0);
 
@@ -61,7 +66,7 @@ int main()
         shutdown(client_socket, SD_SEND);
     }
 
-    // Close the socket after sending the message
+    // Close the server socket if the loop ever exits
     if (SYSTEM == "Windows")
     {
         closesocket(server_socket);
