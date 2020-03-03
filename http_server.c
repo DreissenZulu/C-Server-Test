@@ -13,9 +13,8 @@ int main()
 
     // Read and put the html page, index.html, into memory
     FILE *html_page = fopen("./index.html", "r");
-    char html_string[300];
-    char http_header[2048] = "HTTP/1.1 200 OK\r\n"
-                             "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+    char html_string[600];
+    char http_header[2048] = "HTTP/1.1 200 OK\r\n\r\n";
     fgets(html_string, sizeof(html_string), html_page);
 
     // Response header tells the client that the request was received successfully
