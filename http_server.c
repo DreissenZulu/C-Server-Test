@@ -13,7 +13,7 @@ int main()
 
     // Read and put the html page, index.html, into memory
     FILE *html_page = fopen("./index.html", "r");
-    char html_string[1024];
+    char html_string[300];
     char http_header[2048] = "HTTP/1.1 200 OK\r\n"
                              "Content-Type: text/html; charset=UTF-8\r\n\r\n";
     fgets(html_string, sizeof(html_string), html_page);
@@ -59,7 +59,7 @@ int main()
         send(client_socket, http_header, strlen(http_header), 0);
 
         printf("Data sent to client\n");
-        closesocket(client_socket);
+        shutdown(client_socket, SD_SEND);
     }
 
     // Close the socket after sending the message
